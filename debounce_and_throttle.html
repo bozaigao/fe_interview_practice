@@ -1,0 +1,58 @@
+<!-- 函数防抖与节流 -->
+<html>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <style>
+    .test {
+      color: red;
+      font-size: 20px;
+    }
+  </style>
+  <body>
+    <div>输入: <input type="text" id="input" /></div>
+  </body>
+  <script>
+    const input = document.getElementById("input");
+    const onValueChange1 = throttle(print, 1000);
+    const onValueChange2 = debounce(print, 1000);
+    input.addEventListener("input", function (e) {
+      onValueChange2(e.target.value);
+    });
+
+    function print(value) {
+      console.log(value);
+    }
+
+    //函数节流：限制函数在单位时间里执行一次函数
+    //应用场景：实时采集用户在单位时间内的输入
+    function throttle(fn, delay = 500) {
+      let timer = null;
+      return function () {
+        if (!timer) {
+          fn.apply(this, arguments);
+          timer = setTimeout(() => {
+            clearTimeout(timer);
+            timer = null;
+          }, delay);
+        }
+      };
+    }
+
+    //函数防抖：短时间内多次触发同一事件，只执行最后一次，或者只执行最开始的一次，中间的不执行
+    //应用场景：input输入框当用户输入完成后最后一次提交输入内容
+    function debounce(fn, delay) {
+      let timer = null;
+      return function () {
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+
+        timer = setTimeout(() => {
+          fn.apply(this, arguments);
+        }, delay);
+      };
+    }
+  </script>
+</html>
