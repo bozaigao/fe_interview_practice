@@ -9,8 +9,10 @@ function delay(seconds = 500) {
   });
 }
 
+//同步版retry
 function retry(fn, retries) {
   try {
+    console.log("retries", retries);
     fn();
     return Promise.resolve();
   } catch (e) {
@@ -24,8 +26,46 @@ function retry(fn, retries) {
   }
 }
 
+//异步版retry
+function retry(fn, retries) {
+  try {
+    console.log("retries", retries);
+    return fn()
+      .then(() => {
+        return Promise.resolve();
+      })
+      .catch((e) => {
+        if (retries > 0) {
+          return delay(1000).then(() => {
+            return retry(fn, retries - 1);
+          });
+        } else {
+          return Promise.reject(e);
+        }
+      });
+  } catch (e) {
+    if (retries > 0) {
+      return delay(1000).then(() => {
+        return retry(fn, retries - 1);
+      });
+    } else {
+      return Promise.reject(e);
+    }
+  }
+}
+
 retry(() => {
-  console.log(qwe);
+  //异步任务
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      try {
+        console.log(qwe);
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    }, 200);
+  });
 }, 3).then(
   () => {
     console.log("执行成功");
