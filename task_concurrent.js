@@ -5,7 +5,6 @@
 const limit = 5;
 //正在执行中的任务数量
 let taskIdQueue = [];
-let flag = true;
 function getDelay(miliseconds = 300) {
   return function delay(taskId) {
     return new Promise((resolve, reject) => {
