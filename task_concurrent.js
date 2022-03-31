@@ -1,57 +1,48 @@
-/**
- * 任务并发问题：在一个任务队列中有很多个异步任务，限定并发的数量，当队列不为空就一直执行
- */
-//并发任务限制数量
-const limit = 5;
-//正在执行中的任务数量
-let taskIdQueue = [];
-function getDelay(time = 300) {
-  return function delay(taskId) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        console.log("执行", taskId);
-        resolve();
-        taskIdQueue.splice(taskIdQueue.indexOf(taskId), 1);
-        deleteTask(taskId);
-        if (taskQueue.length > 0 && taskIdQueue.length < limit) {
-          exeTasks(taskQueue);
-        }
-      }, time);
-    });
+const maxLimit = 5;
+let taskIds = [];
+let tasks = [];
+
+function getTask(time) {
+  return function (taskId) {
+    setTimeout(() => {
+      console.log(taskId);
+      taskIds.splice(taskIds.indexOf(taskId), 1);
+      deleteTask(taskId);
+      if (tasks.length > 0 && taskIds.length < maxLimit) {
+        executeTask(tasks);
+      }
+    }, time);
   };
 }
 
 function deleteTask(taskId) {
-  for (let i = 0; i < taskQueue.length; i++) {
-    if (taskQueue[i].taskId === taskId) {
-      taskQueue.splice(i, 1);
+  for (let i = 0; i < tasks.length; i++) {
+    if (tasks[i].taskId === taskId) {
+      tasks.splice(i, 1);
     }
   }
 }
 
-var taskQueue = [
-  { taskId: 0, task: getDelay(1000) },
-  { taskId: 1, task: getDelay(2000) },
-  { taskId: 2, task: getDelay(100) },
-  { taskId: 3, task: getDelay(500) },
-  { taskId: 4, task: getDelay(4000) },
-  { taskId: 5, task: getDelay(400) },
-  { taskId: 6, task: getDelay(1000) },
-  { taskId: 7, task: getDelay(2000) },
-  { taskId: 8, task: getDelay(100) },
-  { taskId: 9, task: getDelay(500) },
+tasks = [
+  { taskId: 1, task: getTask(1000) },
+  { taskId: 2, task: getTask(1000) },
+  { taskId: 3, task: getTask(1000) },
+  { taskId: 4, task: getTask(1000) },
+  { taskId: 5, task: getTask(1000) },
+  { taskId: 6, task: getTask(1000) },
+  { taskId: 7, task: getTask(1000) },
+  { taskId: 8, task: getTask(1000) },
+  { taskId: 9, task: getTask(1000) },
+  { taskId: 10, task: getTask(1000) },
 ];
 
-function exeTasks(tasks) {
+function executeTask(tasks) {
   for (let i = 0; i < tasks.length; i++) {
-    if (taskIdQueue.length < limit) {
-      const taskId = tasks[i].taskId;
-      if (taskIdQueue.indexOf(taskId) === -1) {
-        taskIdQueue.push(taskId);
-        tasks[i].task(taskId);
-      }
+    if (taskIds.length < maxLimit && taskIds.indexOf(tasks[i].taskId) === -1) {
+      taskIds.push(tasks[i].taskId);
+      tasks[i].task(tasks[i].taskId);
     }
   }
 }
 
-exeTasks(taskQueue);
+executeTask(tasks);
