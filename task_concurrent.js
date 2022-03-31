@@ -5,7 +5,7 @@
 const limit = 5;
 //正在执行中的任务数量
 let taskIdQueue = [];
-function getDelay(miliseconds = 300) {
+function getDelay(time = 300) {
   return function delay(taskId) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -16,7 +16,7 @@ function getDelay(miliseconds = 300) {
         if (taskQueue.length > 0 && taskIdQueue.length < limit) {
           exeTasks(taskQueue);
         }
-      }, miliseconds);
+      }, time);
     });
   };
 }
