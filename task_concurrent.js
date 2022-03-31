@@ -9,6 +9,7 @@ function getDelay(miliseconds = 300) {
   return function delay(taskId) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
+        console.log("执行", taskId);
         resolve();
         taskIdQueue.splice(taskIdQueue.indexOf(taskId), 1);
         deleteTask(taskId);

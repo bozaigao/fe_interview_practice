@@ -13,10 +13,10 @@
     <div>输入: <input type="text" id="input" /></div>
   </body>
   <script>
-    const input = document.getElementById("input");
+    const input = document.getElementById('input');
     const onValueChange1 = throttle(print, 1000);
     const onValueChange2 = debounce(print, 1000);
-    input.addEventListener("input", function (e) {
+    input.addEventListener('input', function (e) {
       onValueChange2(e.target.value);
     });
 
@@ -27,15 +27,14 @@
     //函数节流：限制函数在单位时间里执行一次函数
     //应用场景：实时采集用户在单位时间内的输入
     function throttle(fn, delay = 500) {
-      let timer = null;
+      let canRun = true;
       return function () {
-        if (!timer) {
+        if (!canRun) return;
+        canRun = false;
+        setTimeout(() => {
           fn.apply(this, arguments);
-          timer = setTimeout(() => {
-            clearTimeout(timer);
-            timer = null;
-          }, delay);
-        }
+          canRun = true;
+        }, delay);
       };
     }
 
@@ -44,11 +43,7 @@
     function debounce(fn, delay) {
       let timer = null;
       return function () {
-        if (timer) {
-          clearTimeout(timer);
-          timer = null;
-        }
-
+        if (timer) clearTimeout(timer);
         timer = setTimeout(() => {
           fn.apply(this, arguments);
         }, delay);
