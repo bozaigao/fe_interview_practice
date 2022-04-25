@@ -1,36 +1,44 @@
 <!DOCTYPE html>
 <html>
-  　　<head>
-    <meta charset="utf-8" />
-    <title></title>　　　
-    <style type="text/css">
-   html,body{
-           height: 100%;
-       }
-        .wrap1{
-            width: 500px;
-            height: 300px;
-            background-color: greenyellow;
-            float: left;
-        }
-        .wrap2{
-            height: 100%;
-            background-color: hotpink;
-            /* overflow: hidden; */
-        }
-        .son{
-            height: 100%;
-            margin-left: 500px;
-            background-color: khaki;
-        }
-    </style>
-  </head>
-  　　　
-  <body>
-    <!--body部分，设置三个div-->
-    <div class="wrap1"></div>
-    <div class="wrap2">
-      <div class="son"></div>
-    </div>
-  </body>
+<head>
+	<title></title>
+</head>
+<body>
+<div id="pics">
+	<img src="" pic-src="./c.jpg" webppic-src="./c.webp">
+	<img src="" pic-src="./c.jpg" webppic-src="./c.webp">
+	<img src="" pic-src="./c.jpg" webppic-src="./c.webp">
+</div>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript">
+// 公共方法，操作放原图还是放WebP图
+var checkPic = function(isWebP){
+	$("#pics img").each(function(i,v){
+		var src = isWebP?$(v).attr('webppic-src'):$(v).attr('pic-src');
+		$(v).attr('src',src);
+	})
+}
+// 第一种方法
+var isWebP = false;
+var img = new Image();
+img.onload = function(){
+	isWebP = !!(img.height>0 && img.width>0);
+	checkPic(isWebP);
+};
+img.onerror = function(){
+	isWebP = false;
+	checkPic(isWebP);
+};
+img.src = './c.webp';
+// 第二种方法
+// var checkWebp = function(){
+//     try{
+//         return (document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') == 0);
+//     }catch(err) {
+//         return  false;
+//     }
+// }
+// checkPic(checkWebp());
+</script>
+</body>
 </html>
