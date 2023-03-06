@@ -1,90 +1,39 @@
-// /**
-//  * retry实现，当其中一次操作执行成功就进入then，当出现报错就进行延迟再次尝试，知道尝试次数用完
-//  */
-// function delay(seconds = 500) {
-//   return new Promise((resolve, _) => {
-//     setTimeout(() => {
-//       resolve();
-//     }, seconds);
-//   });
-// }
+/**
+ * 方式一
+ * 请求失败后，加入失败重试功能，如果5次全部失败，则返回失败结果，只要5次尝试中有任意一次成功，则返回成功
+ * @param fn 绑定函数
+ * @param times 请求次数
+ * @param delay 延迟时间
+ */
+function retry(fn,times, delay){
 
-// //同步版retry
-// // function retry(fn, retries) {
-// //   try {
-// //     console.log("retries", retries);
-// //     fn();
-// //     return Promise.resolve();
-// //   } catch (e) {
-// //     if (retries > 0) {
-// //       return delay(1000).then(() => {
-// //         return retry(fn, retries - 1);
-// //       });
-// //     } else {
-// //       return Promise.reject(e);
-// //     }
-// //   }
-// // }
+  return new Promise((resolve,reject)=>{
 
-// //异步版retry
-// function retry(fn, retries) {
-//   console.log('retries', retries);
-//   return fn()
-//     .then(() => {
-//       return Promise.resolve();
-//     })
-//     .catch((e) => {
-//       if (retries > 0) {
-//         return delay(1000).then(() => {
-//           return retry(fn, retries - 1);
-//         });
-//       } else {
-//         return Promise.reject(e);
-//       }
-//     });
-// }
-
-// retry(() => {
-//   //异步任务
-//   return new Promise((resolve, reject) => {
-//     try {
-//       console.log(qwe);
-//       resolve();
-//     } catch (e) {
-//       reject(e);
-//     }
-//   });
-// }, 3);
-function delay(time) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, time);
-  });
-}
-
-function retry(func, retries) {
-  console.log('retries', retries);
-  return func()
-    .then(() => {
-      return Promise.resolve();
-    })
-    .catch((e) => {
-      if (retries > 0) {
-        return retry(func, retries - 1);
-      } else {
-        return Promise.reject(e);
-      }
-    });
-}
-
-retry(() => {
-  return new Promise((resolve, reject) => {
-    try {
-      console.log(q);
-      resolve();
-    } catch (error) {
-      reject(error);
+    const func = function(){
+      fn().then(resolve).catch((e)=>{
+        if(times-- >0){
+          console.log(`还有${times}次机会`)
+          setTimeout(func, delay)
+        }else{
+          reject(e)
+        }
+      })
     }
+    return func();
+
   });
-}, 3);
+}
+
+function getUser() {
+  return new Promise((resolve, reject) => {
+      const result = Math.floor(Math.random() * 10)
+      return result < 3 ? resolve({
+          id: result,
+          username: 'ming'
+      }) : reject(new Error(`The ${result} is greater than 3`))
+  })
+}
+
+retry(getUser, 5, 1000).then(r => {
+  console.log(`The result is ${r.username}`)
+})

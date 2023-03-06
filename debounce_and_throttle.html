@@ -16,10 +16,10 @@
 </body>
 <script>
   const input = document.getElementById('input');
-  const onValueChange1 = throttle(print, 1000);
+  const onValueChange1 = throttle(print, 200);
   const onValueChange2 = debounce(print, 1000);
   input.addEventListener('input', function (e) {
-    onValueChange2(e.target.value);
+    onValueChange1(e.target.value);
   });
 
   function print(value) {
@@ -28,30 +28,53 @@
 
   //函数节流：限制函数在单位时间里执行一次函数
   //应用场景：实时采集用户在单位时间内的输入
-  function throttle(fn, delay = 500) {
-    let canRun = true;
-    return function () {
-      if (!canRun) return;
-      canRun = false;
-      setTimeout(() => {
-        fn.apply(this, arguments);
-        canRun = true;
-      }, delay);
-    };
+  function throttle(fn,delay){
+      let canRun = true;
+      return function(){
+        if(!canRun) return;
+        canRun = false;
+        setTimeout(()=>{
+          fn.apply(this,arguments);
+          canRun = true;
+        },delay);
+      }
   }
 
   //函数防抖：短时间内多次触发同一事件，只执行最后一次，或者只执行最开始的一次，中间的不执行
   //应用场景：input输入框当用户输入完成后最后一次提交输入内容
-  function debounce(fn, delay) {
-    let timer = null;
-    return function () {
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => {
-        fn.apply(this, arguments);
-        clearTimeout(timer);
-      }, delay);
-    };
+  //前置防抖适用于收集用户输入框内容，以最后一次为准
+function debounce(fn,delay){
+  let timer = null;
+
+  return function(){
+    timer && clearTimeout(timer);
+    timer = setTimeout(()=>{
+      fn.apply(this,arguments);
+    },delay);
   }
+}
+
+//后置防抖 
+// const requestMap = new Map();
+// function debounce(key, fn, delayTime = 200) {
+//   return function () {
+//     return new Promise((resolve, reject) => {
+//       const excutionNow = !requestMap.get(key);
+//         if (requestMap.get(key)) {
+//           reject(false);
+//         } else {
+//           requestMap.set(key, true);
+//           const timer = setTimeout(() => {
+//             requestMap.delete(key);
+//             clearTimeout(timer);
+//           }, delayTime);
+//           if (excutionNow) {
+//             resolve(fn.apply(arguments));
+//           }
+//         }
+//     });
+//   };
+// }
 </script>
 
 </html>
